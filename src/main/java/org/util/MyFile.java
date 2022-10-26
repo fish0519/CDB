@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 
 public class MyFile implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3975484140602891927L;
     private File file;// 文件
     private String file_md5;// 文件名
     private int starPos;// 开始位置

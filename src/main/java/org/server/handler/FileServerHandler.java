@@ -14,24 +14,8 @@ public class FileServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg instanceof MyFile) {
-            MyFile ef = (MyFile) msg;
-            byte[] bytes = ef.getBytes();
-            byteRead = ef.getEndPos();
-            String md5 = ef.getFile_md5();//文件名
-            String path = file_dir + File.separator + md5;
-            File file = new File(path);
-            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
-            randomAccessFile.seek(start);
-            randomAccessFile.write(bytes);
-            start = start + byteRead;
-            if (byteRead > 0) {
-                ctx.writeAndFlush(start);
-            } else {
-                randomAccessFile.close();
-                ctx.close();
-            }
-        }
+        String clientMsg = (String)msg;
+        System.out.println("客户端消息:"+clientMsg);
     }
 
     @Override
