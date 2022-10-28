@@ -1,23 +1,29 @@
 package org.client.handler;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.buffer.UnpooledDirectByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.util.MyMapFile;
+
+import java.nio.charset.StandardCharsets;
 
 public class FileClientHandler extends ChannelInboundHandlerAdapter {
 
     MyMapFile readFile;
     MyMapFile writeFile;
+    public static int num = 0;
 
     public FileClientHandler(MyMapFile readFile, MyMapFile writeFile) {
        this.readFile = readFile;
        this.writeFile = writeFile;
     }
     public void channelActive(ChannelHandlerContext ctx) {
-        byte[] bytes = readFile.readFile();
-        if(bytes.length > 0)
+        ByteBuf byteBuf = readFile.readFile();
+        if(byteBuf != null)
         {
-            ctx.writeAndFlush(bytes);
+            ctx.writeAndFlush(byteBuf);
         }else {
             System.out.println("文件已经读完");
         }
@@ -26,12 +32,12 @@ public class FileClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
         String serverMsg = (String)msg;
-        System.out.println("服务端消息:" + serverMsg);
+        System.out.println("第"+ (++num) +"条服务端消息:" + serverMsg);
 
-        byte[] bytes = readFile.readFile();
-        if(bytes.length > 0)
+        ByteBuf byteBuf = readFile.readFile();
+        if(byteBuf != null)
         {
-            ctx.writeAndFlush(bytes);
+            ctx.writeAndFlush(byteBuf);
         }else {
             System.out.println("文件已经读完");
         }

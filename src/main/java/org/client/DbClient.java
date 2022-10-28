@@ -1,16 +1,17 @@
 package org.client;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
+import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.codec.string.StringDecoder;
 import org.apache.commons.lang.SystemUtils;
 import org.client.handler.FileClientHandler;
@@ -18,6 +19,8 @@ import org.util.MyMapFile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class DbClient {
     private final boolean isEpollEnabled;
@@ -43,18 +46,17 @@ public class DbClient {
 
             if(isEpollEnabled)
             {
-                b.channel(EpollServerSocketChannel.class);
+                b.channel(EpollSocketChannel.class);
             }else{
-                b.channel(NioServerSocketChannel.class);
+                b.channel(NioSocketChannel.class);
             }
 
-            b.channel(NioSocketChannel.class)
-             .option(ChannelOption.TCP_NODELAY, true)
-             .handler(new ChannelInitializer<Channel>() {
+            b.handler(new ChannelInitializer<Channel>() {
                 @Override
                 protected void initChannel(Channel ch) throws Exception {
-                    //\r\n作为分包符
-                    ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
+//                    ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
+                    ByteBuf delimiter = Unpooled.copiedBuffer("$".getBytes());
+                    ch.pipeline().addLast(new DelimiterBasedFrameDecoder(10240, delimiter));
                     ch.pipeline().addLast(new StringDecoder());
                     ch.pipeline().addLast(new FileClientHandler(readFile, writeFile));
                 }
@@ -68,10 +70,17 @@ public class DbClient {
     }
 
     public static void main(String[] args) throws Exception {
+
+
         int port = 8888;
         String host = "127.0.0.1";
-        String readFileName = "d:/1.txt";
-        String writeFileName = "d:/2.txt";
+        String readFileName = DbClient.class.getResource("/1.txt").getPath();
+        readFileName = URLDecoder.decode(readFileName, "UTF-8");
+        String writeFileName = DbClient.class.getResource("/2.txt").getPath();
+        writeFileName = URLDecoder.decode(readFileName, "UTF-8");
+
+        System.out.println(readFileName);
+
 
         if (args != null && args.length > 0) {
             try {
@@ -87,10 +96,10 @@ public class DbClient {
 
         try {
             File readFile = new File(readFileName);
-            MyMapFile readMapFile = new MyMapFile(readFile, 1024, "r");
+            MyMapFile readMapFile = new MyMapFile(readFile, 498, "r");
 
             File writeFile = new File(writeFileName);
-            MyMapFile writeMapFile = new MyMapFile(readFile, 1024, "rw");
+            MyMapFile writeMapFile = new MyMapFile(writeFile, 500, "rw");
 
             new DbClient().connect(port, host, readMapFile, writeMapFile);
 
