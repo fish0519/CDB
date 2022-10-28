@@ -5,10 +5,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
@@ -20,11 +18,9 @@ import org.util.MyMapFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 public class DbClient {
     private final boolean isEpollEnabled;
-
 
     public DbClient(){
         this.isEpollEnabled = SystemUtils.IS_OS_LINUX;
@@ -77,7 +73,7 @@ public class DbClient {
         String readFileName = DbClient.class.getResource("/1.txt").getPath();
         readFileName = URLDecoder.decode(readFileName, "UTF-8");
         String writeFileName = DbClient.class.getResource("/2.txt").getPath();
-        writeFileName = URLDecoder.decode(readFileName, "UTF-8");
+        writeFileName = URLDecoder.decode(writeFileName, "UTF-8");
 
         System.out.println(readFileName);
 

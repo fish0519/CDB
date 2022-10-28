@@ -1,19 +1,19 @@
 package org.client.handler;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.buffer.UnpooledDirectByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.util.MyMapFile;
 
-import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FileClientHandler extends ChannelInboundHandlerAdapter {
 
     MyMapFile readFile;
     MyMapFile writeFile;
     public static int num = 0;
+    public static ExecutorService threadPool = Executors.newSingleThreadExecutor();
 
     public FileClientHandler(MyMapFile readFile, MyMapFile writeFile) {
        this.readFile = readFile;
@@ -29,10 +29,17 @@ public class FileClientHandler extends ChannelInboundHandlerAdapter {
         }
     }
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, final Object msg) throws Exception {
 
-        String serverMsg = (String)msg;
+        final String serverMsg = (String)msg;
         System.out.println("第"+ (++num) +"条服务端消息:" + serverMsg);
+        threadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                byte[] sBytes = serverMsg.getBytes();
+                writeFile.writeFile(sBytes);
+            }
+        });
 
         ByteBuf byteBuf = readFile.readFile();
         if(byteBuf != null)

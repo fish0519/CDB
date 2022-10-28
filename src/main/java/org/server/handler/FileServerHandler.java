@@ -2,7 +2,6 @@ package org.server.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -15,7 +14,7 @@ public class FileServerHandler extends ChannelInboundHandlerAdapter {
         String clientMsg = (String)msg;
         System.out.println("第"+(++num)+"条客户端消息:"+clientMsg);
 
-        String serverMsg = "服务端的"+num+"$";
+        String serverMsg = "服务端的"+num+"\n$";
         ByteBuf resp = Unpooled.copiedBuffer(serverMsg.getBytes());
         ctx.writeAndFlush(resp);
     }
