@@ -4,6 +4,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.parser.MyLexer;
+import org.parser.Parser;
+
+import java.io.IOException;
+import java.io.StringReader;
 
 public class FileServerHandler extends ChannelInboundHandlerAdapter {
 
@@ -14,8 +19,24 @@ public class FileServerHandler extends ChannelInboundHandlerAdapter {
         String clientMsg = (String)msg;
         System.out.println("第"+(++num)+"条客户端消息:"+clientMsg);
 
-        String serverMsg = "服务端的"+num+"\n$";
-        ByteBuf resp = Unpooled.copiedBuffer(serverMsg.getBytes());
+        Parser.Lexer lexer = new MyLexer(new StringReader(clientMsg));
+        Parser parser = new Parser(lexer);
+
+        StringBuilder serverMsg = null;
+
+        try {
+            if(parser.parse())
+            {
+                System.out.print(parser.result);
+                serverMsg = parser.result;
+                String tem = serverMsg.toString();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        serverMsg.append("$");
+        ByteBuf resp = Unpooled.copiedBuffer(serverMsg.toString().getBytes());
         ctx.writeAndFlush(resp);
     }
 

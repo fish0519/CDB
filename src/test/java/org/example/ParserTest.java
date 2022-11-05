@@ -8,12 +8,10 @@ import java.io.StringReader;
 
 public class ParserTest {
     public static void main(String[] args) {
-        String sql = "1+2+3+4\n5+6\n";
+        String sql = "1+2+3+4\r\n5+6\r\n";
 
         Parser.Lexer lexer = new MyLexer(new StringReader(sql));
         Parser parser = new Parser(lexer);
-
-        StringBuilder result = new StringBuilder();
 
         try {
             if(parser.parse())

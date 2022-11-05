@@ -35,7 +35,7 @@ input: /* empty string */
 line: NL { }
     | exp NL {
         result.append(((MyLexer)yylexer).getOriginStr());
-        result.append(" = " + $exp + "\n");
+        result.append(" = " + $exp);
     }
     ;
 

@@ -32,7 +32,7 @@ public class FileClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, final Object msg) throws Exception {
 
         final String serverMsg = (String)msg;
-        System.out.println("第"+ (++num) +"条服务端消息:" + serverMsg);
+        System.out.print("第"+ (++num) +"条服务端消息:" + serverMsg);
         threadPool.execute(new Runnable() {
             @Override
             public void run() {

@@ -69,7 +69,7 @@ package org.parser;
 %}
 
 NUM = [0-9]+ ("." [0-9]+)?
-NL  = \n | \r | \r\n
+NL  = \r\n | \n | \r | ;
 
 %%
 
