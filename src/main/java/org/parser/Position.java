@@ -1,45 +1,23 @@
 package org.parser;
 
-/**
- * A class defining a point in the input.
- */
 public class Position {
-    public int line = 1;
-    public int column = 1;
 
-    public Position() {
-        line = 1;
-        column = 1;
+    public int line;
+    public int column;
+    public long chars;
+
+    public Position(int line, int column, long chars) {
+        this.line = line;
+        this.column = column;
+        this.chars = chars;
     }
 
-    public Position(int l, int t) {
-        line = l;
-        column = t;
-    }
-
-    public Position(Position p) {
-        line = p.line;
-        column = p.column;
-    }
-
-    public void set(Position p) {
-        line = p.line;
-        column = p.column;
-    }
-
-    public boolean equals(Position l) {
-        return l.line == line && l.column == column;
-    }
-
+    @Override
     public String toString() {
-        return Integer.toString(line) + "." + Integer.toString(column);
-    }
-
-    public int line() {
-        return line;
-    }
-
-    public int column() {
-        return column;
+        return "Position{" +
+                "line=" + line +
+                ", column=" + column +
+                ", chars=" + chars +
+                '}';
     }
 }
