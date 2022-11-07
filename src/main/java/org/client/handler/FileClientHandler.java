@@ -7,6 +7,7 @@ import org.util.MyMapFile;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class FileClientHandler extends ChannelInboundHandlerAdapter {
 
@@ -46,7 +47,14 @@ public class FileClientHandler extends ChannelInboundHandlerAdapter {
         {
             ctx.writeAndFlush(byteBuf);
         }else {
-            System.out.println("文件已经读完");
+            System.out.println("文件已经全部传输, 等待回写结果");
+            threadPool.shutdown();
+            while(!threadPool.awaitTermination(10, TimeUnit.MILLISECONDS))
+            {
+                System.out.println("writing");
+            }
+            System.out.println("Success");
+            ctx.close();
         }
     }
 
