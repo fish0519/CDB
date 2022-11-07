@@ -53,6 +53,7 @@ public class FileClientHandler extends ChannelInboundHandlerAdapter {
             {
                 System.out.println("writing");
             }
+            writeFile.closeFile();
             System.out.println("Success");
             ctx.close();
         }
