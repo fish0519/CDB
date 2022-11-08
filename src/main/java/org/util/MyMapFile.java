@@ -1,6 +1,7 @@
 package org.util;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 
 import java.io.*;
@@ -72,7 +73,9 @@ public class MyMapFile {
             scan.close();
 
             byteArr[byteArrLineIndex + 1] = '$';
-            ByteBuf byteBuf = Unpooled.copiedBuffer(byteArr, 0, byteArrLineIndex + 2);
+//            ByteBuf byteBuf = Unpooled.copiedBuffer(byteArr, 0, byteArrLineIndex + 2);
+            ByteBuf byteBuf = PooledByteBufAllocator.DEFAULT.directBuffer(byteArrLineIndex + 2);
+            byteBuf.writeBytes(byteArr, 0, byteArrLineIndex + 2);
             return byteBuf;
         }
         return null;

@@ -2,6 +2,7 @@ package org.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -10,6 +11,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.compression.JdkZlibDecoder;
+import io.netty.handler.codec.compression.JdkZlibEncoder;
 import io.netty.handler.codec.string.StringDecoder;
 import org.apache.commons.lang.SystemUtils;
 import org.client.handler.FileClientHandler;
@@ -47,10 +50,17 @@ public class DbClient {
                 b.channel(NioSocketChannel.class);
             }
 
-            b.handler(new ChannelInitializer<Channel>() {
+
+            b.option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.SO_RCVBUF, 1024*128)
+                    .option(ChannelOption.SO_SNDBUF, 1024*128)
+                    .option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true))
+                    .handler(new ChannelInitializer<Channel>() {
                 @Override
                 protected void initChannel(Channel ch) throws Exception {
 //                    ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
+                    ch.pipeline().addLast("gzipDecoder", new JdkZlibDecoder());
+                    ch.pipeline().addLast("gzipEncoder", new JdkZlibEncoder(9));
                     ByteBuf delimiter = Unpooled.copiedBuffer("$".getBytes());
                     ch.pipeline().addLast(new DelimiterBasedFrameDecoder(10240, delimiter));
                     ch.pipeline().addLast(new StringDecoder());
