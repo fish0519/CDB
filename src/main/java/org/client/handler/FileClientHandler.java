@@ -7,11 +7,13 @@ import org.util.MyMapFile;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class FileClientHandler extends ChannelInboundHandlerAdapter {
 
     MyMapFile readFile;
     MyMapFile writeFile;
+    public static ByteBuf preByteBuf;
     public static int num = 0;
     public static ExecutorService threadPool = Executors.newSingleThreadExecutor();
 
@@ -41,12 +43,21 @@ public class FileClientHandler extends ChannelInboundHandlerAdapter {
             }
         });
 
-        ByteBuf byteBuf = readFile.readFile();
+        ByteBuf byteBuf = preByteBuf != null ? preByteBuf : readFile.readFile();
         if(byteBuf != null)
         {
             ctx.writeAndFlush(byteBuf);
+            preByteBuf = readFile.readFile();
         }else {
-            System.out.println("文件已经读完");
+            System.out.println("文件已经全部传输, 等待回写结果");
+            threadPool.shutdown();
+            while(!threadPool.awaitTermination(10, TimeUnit.MILLISECONDS))
+            {
+                System.out.println("writing");
+            }
+            writeFile.closeFile();
+            System.out.println("Success");
+            ctx.close();
         }
     }
 

@@ -16,12 +16,14 @@ public class MyMapFile {
     public RandomAccessFile raf;
     public FileChannel fileChannel;
     public long index = 0;
+    public File file;
 
     public MyMapFile(File file, int mapSize, String mode) throws FileNotFoundException {
         this.raf = new RandomAccessFile(file, mode);
         this.fileChannel = raf.getChannel();
         this.mapSize = mapSize;
         this.size = file.length();
+        this.file = file;
     }
 
     public synchronized ByteBuf readFile()
@@ -92,6 +94,24 @@ public class MyMapFile {
             e.printStackTrace();
         }
         index = targetIndex;
+    }
+
+    public synchronized void closeFile()
+    {
+        try {
+            if(fileChannel != null)
+            {
+                fileChannel.close();
+            }
+
+            if(raf != null)
+            {
+                raf.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
