@@ -52,8 +52,8 @@ public class DbClient {
 
 
             b.option(ChannelOption.TCP_NODELAY, true)
-                    .option(ChannelOption.SO_RCVBUF, 1024*128)
-                    .option(ChannelOption.SO_SNDBUF, 1024*128)
+                    .option(ChannelOption.SO_RCVBUF, 1024*256)
+                    .option(ChannelOption.SO_SNDBUF, 1024*256)
                     .option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true))
                     .handler(new ChannelInitializer<Channel>() {
                 @Override

@@ -26,6 +26,7 @@ public class FileClientHandler extends ChannelInboundHandlerAdapter {
         if(byteBuf != null)
         {
             ctx.writeAndFlush(byteBuf);
+            preByteBuf = readFile.readFile();
         }else {
             System.out.println("文件已经读完");
         }

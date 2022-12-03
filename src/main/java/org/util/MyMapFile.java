@@ -27,7 +27,7 @@ public class MyMapFile {
         this.file = file;
     }
 
-    public synchronized ByteBuf readFile()
+    public ByteBuf readFile()
     {
         long curIndex = index;
         System.out.println("readFile");
@@ -81,7 +81,7 @@ public class MyMapFile {
         return null;
     }
 
-    public synchronized void writeFile(byte[] byteArr)
+    public void writeFile(byte[] byteArr)
     {
         long curIndex = index;
         System.out.println("writeFile");
@@ -99,7 +99,7 @@ public class MyMapFile {
         index = targetIndex;
     }
 
-    public synchronized void closeFile()
+    public void closeFile()
     {
         try {
             if(fileChannel != null)
