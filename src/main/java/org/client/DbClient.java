@@ -19,14 +19,35 @@ import org.client.handler.FileClientHandler;
 import org.client.handler.MultiFileClientHandler;
 import org.util.MyMapFile;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.net.URLDecoder;
+import java.util.Properties;
 
 public class DbClient {
     private final boolean isEpollEnabled;
     Bootstrap b;
     EventLoopGroup group;
+
+    public static Properties properties = new Properties();
+    static {
+        try {
+            String clientFile = DbClient.class.getResource("/client.properties").getPath();
+            clientFile = URLDecoder.decode(clientFile, "UTF-8");
+
+            properties.load(new InputStreamReader(new FileInputStream(clientFile)));
+
+            System.setProperty("clientNum", properties.getProperty("clientNum").trim());
+            System.setProperty("clientMode", properties.getProperty("clientMode").trim());
+            System.setProperty("mmpSize", properties.getProperty("mmpSize").trim());
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public DbClient(){
         this.isEpollEnabled = SystemUtils.IS_OS_LINUX;
@@ -64,10 +85,14 @@ public class DbClient {
                     ch.pipeline().addLast("gzipDecoder", new JdkZlibDecoder());
                     ch.pipeline().addLast("gzipEncoder", new JdkZlibEncoder(9));
                     ByteBuf delimiter = Unpooled.copiedBuffer("$".getBytes());
-                    ch.pipeline().addLast(new DelimiterBasedFrameDecoder(10240, delimiter));
+                    ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024*1024, delimiter));
                     ch.pipeline().addLast(new StringDecoder());
-//                    ch.pipeline().addLast(new FileClientHandler(readFile, writeFile));
-                    ch.pipeline().addLast(new MultiFileClientHandler(readFile, writeFile));
+                    if(System.getProperty("clientMode").equals("1"))
+                    {
+                        ch.pipeline().addLast(new FileClientHandler(readFile, writeFile));
+                    }else{
+                        ch.pipeline().addLast(new MultiFileClientHandler(readFile, writeFile));
+                    }
                 }
             });
 
@@ -80,54 +105,54 @@ public class DbClient {
     {
         try {
             ChannelFuture f = b.connect(host, port).sync();
-            //阻塞
-//            f.channel().closeFuture().sync();
-
+            if(System.getProperty("clientMode").equals("1"))
+            {
+                //阻塞
+                f.channel().closeFuture().sync();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-//            group.shutdownGracefully();
+            if(System.getProperty("clientMode").equals("1"))
+            {
+                group.shutdownGracefully();
+            }
         }
     }
 
     public static void main(String[] args) throws Exception {
 
-
-        int port = 8888;
-        String host = "127.0.0.1";
+        int port = Integer.parseInt(properties.getProperty("port").trim());
+        String host = properties.getProperty("ip").trim();
         String readFileName = DbClient.class.getResource("/1.txt").getPath();
         readFileName = URLDecoder.decode(readFileName, "UTF-8");
         String writeFileName = DbClient.class.getResource("/2.txt").getPath();
         writeFileName = URLDecoder.decode(writeFileName, "UTF-8");
 
-        System.out.println(readFileName);
-
-
-        if (args != null && args.length > 0) {
-            try {
-                port = Integer.valueOf(args[0]);
-                host = args[1];
-                readFileName = args[2];
-                writeFileName = args[2];
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-        }
-
-
         try {
+
+            int mmpSize = Integer.parseInt(properties.getProperty("mmpSize").trim());
+
             File readFile = new File(readFileName);
-            MyMapFile readMapFile = new MyMapFile(readFile, 19, "r");
+            MyMapFile readMapFile = new MyMapFile(readFile, mmpSize, "r");
 
             File writeFile = new File(writeFileName);
-            MyMapFile writeMapFile = new MyMapFile(writeFile, 500, "rw");
+            MyMapFile writeMapFile = new MyMapFile(writeFile, mmpSize*2, "rw");
 
             DbClient dbClient = new DbClient();
             dbClient.connect(readMapFile, writeMapFile);
 
-            dbClient.realConnect(port, host);
+            if(System.getProperty("clientMode").equals("1"))
+            {
+                dbClient.realConnect(port, host);
 
-            dbClient.realConnect(port, host);
+            }else{
+                int clientNum = Integer.parseInt(System.getProperty("clientNum"));
+                for(int i = 0;  i < clientNum; i++)
+                {
+                    dbClient.realConnect(port, host);
+                }
+            }
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

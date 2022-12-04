@@ -15,12 +15,37 @@ import io.netty.handler.codec.compression.JdkZlibDecoder;
 import io.netty.handler.codec.compression.JdkZlibEncoder;
 import io.netty.handler.codec.string.StringDecoder;
 import org.apache.commons.lang.SystemUtils;
+import org.client.DbClient;
+import org.client.handler.FileClientHandler;
+import org.client.handler.MultiFileClientHandler;
 import org.server.handler.FileServerHandler;
 import org.server.handler.MultiFileServerHandler;
+
+import java.io.*;
+import java.net.URLDecoder;
+import java.util.Properties;
 
 public class DbServer {
 
     private final boolean isEpollEnabled;
+
+    public static Properties properties = new Properties();
+    static {
+        try {
+            String clientFile = DbClient.class.getResource("/server.properties").getPath();
+            clientFile = URLDecoder.decode(clientFile, "UTF-8");
+
+            properties.load(new InputStreamReader(new FileInputStream(clientFile)));
+            System.setProperty("serverMode", properties.getProperty("serverMode").trim());
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public DbServer()
     {
@@ -60,10 +85,14 @@ public class DbServer {
                     ch.pipeline().addLast("gzipDecoder", new JdkZlibDecoder());
                     ch.pipeline().addLast("gzipEncoder", new JdkZlibEncoder(9));
                     ByteBuf delimiter = Unpooled.copiedBuffer("$".getBytes());
-                    ch.pipeline().addLast(new DelimiterBasedFrameDecoder(10240, delimiter));
+                    ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024*1024, delimiter));
                     ch.pipeline().addLast(new StringDecoder());
-//                    ch.pipeline().addLast(new FileServerHandler());
-                    ch.pipeline().addLast(new MultiFileServerHandler());
+                    if(System.getProperty("serverMode").equals("1"))
+                    {
+                        ch.pipeline().addLast(new FileServerHandler());
+                    }else{
+                        ch.pipeline().addLast(new MultiFileServerHandler());
+                    }
                 }
             });
 
@@ -78,7 +107,8 @@ public class DbServer {
     public static void main(String[] args) {
         DbServer dbServer = new DbServer();
         try {
-            dbServer.bind(8888);
+            int port = Integer.parseInt(properties.getProperty("port").trim());
+            dbServer.bind(port);
         } catch (Exception e) {
             e.printStackTrace();
         }

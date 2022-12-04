@@ -33,7 +33,6 @@ public class MultiFileServerHandler extends ChannelInboundHandlerAdapter {
                 if (parser.parse()) {
                     System.out.println(parser.result);
                     serverMsg = parser.result;
-                    String tem = serverMsg.toString();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

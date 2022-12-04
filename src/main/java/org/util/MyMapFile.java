@@ -21,9 +21,13 @@ public class MyMapFile {
     public File file;
 
     //并发控制变量
-    public  static int threadNum = 2;
+    public static int threadNum;
     public static int count = 0;
-    public static int[] threadArr = new int[threadNum]; //0 可读；1 可写
+    static {
+        threadNum = Integer.parseInt(System.getProperty("clientNum"));
+        threadArr = new int[threadNum];
+    }
+    public static int[] threadArr; //0 可读；1 可写
     public static boolean flag = true;// true 可读；false 可写
     public static AtomicBoolean finishRead = new AtomicBoolean(false);
 
