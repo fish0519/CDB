@@ -75,8 +75,8 @@ public class DbServer {
                 b.channel(NioServerSocketChannel.class);
             }
             b.option(ChannelOption.TCP_NODELAY, true)
-             .option(ChannelOption.SO_RCVBUF, 1024*256)
-             .option(ChannelOption.SO_SNDBUF, 1024*256)
+             .option(ChannelOption.SO_RCVBUF, 1024*1024)
+             .option(ChannelOption.SO_SNDBUF, 1024*1024)
              .option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true))
              .childHandler(new ChannelInitializer<Channel>() {
                 @Override
