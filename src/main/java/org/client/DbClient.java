@@ -16,6 +16,7 @@ import io.netty.handler.codec.compression.JdkZlibEncoder;
 import io.netty.handler.codec.string.StringDecoder;
 import org.apache.commons.lang.SystemUtils;
 import org.client.handler.FileClientHandler;
+import org.client.handler.MultiFileClientHandler;
 import org.util.MyMapFile;
 
 import java.io.File;
@@ -24,13 +25,14 @@ import java.net.URLDecoder;
 
 public class DbClient {
     private final boolean isEpollEnabled;
+    Bootstrap b;
+    EventLoopGroup group;
 
     public DbClient(){
         this.isEpollEnabled = SystemUtils.IS_OS_LINUX;
     }
 
-    public void connect(int port, String host, final MyMapFile readFile, final MyMapFile writeFile) throws Exception {
-        EventLoopGroup group;
+    public void connect(final MyMapFile readFile, final MyMapFile writeFile) throws Exception {
 
         if(isEpollEnabled)
         {
@@ -40,7 +42,7 @@ public class DbClient {
         }
 
         try {
-            Bootstrap b = new Bootstrap();
+            b = new Bootstrap();
             b.group(group);
 
             if(isEpollEnabled)
@@ -64,14 +66,27 @@ public class DbClient {
                     ByteBuf delimiter = Unpooled.copiedBuffer("$".getBytes());
                     ch.pipeline().addLast(new DelimiterBasedFrameDecoder(10240, delimiter));
                     ch.pipeline().addLast(new StringDecoder());
-                    ch.pipeline().addLast(new FileClientHandler(readFile, writeFile));
+//                    ch.pipeline().addLast(new FileClientHandler(readFile, writeFile));
+                    ch.pipeline().addLast(new MultiFileClientHandler(readFile, writeFile));
                 }
             });
 
-            ChannelFuture f = b.connect(host, port).sync();
-            f.channel().closeFuture().sync();
         } finally {
-            group.shutdownGracefully();
+
+        }
+    }
+
+    public void realConnect(int port, String host)
+    {
+        try {
+            ChannelFuture f = b.connect(host, port).sync();
+            //阻塞
+//            f.channel().closeFuture().sync();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+//            group.shutdownGracefully();
         }
     }
 
@@ -102,12 +117,17 @@ public class DbClient {
 
         try {
             File readFile = new File(readFileName);
-            MyMapFile readMapFile = new MyMapFile(readFile, 498, "r");
+            MyMapFile readMapFile = new MyMapFile(readFile, 19, "r");
 
             File writeFile = new File(writeFileName);
             MyMapFile writeMapFile = new MyMapFile(writeFile, 500, "rw");
 
-            new DbClient().connect(port, host, readMapFile, writeMapFile);
+            DbClient dbClient = new DbClient();
+            dbClient.connect(readMapFile, writeMapFile);
+
+            dbClient.realConnect(port, host);
+
+            dbClient.realConnect(port, host);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

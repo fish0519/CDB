@@ -16,6 +16,7 @@ import io.netty.handler.codec.compression.JdkZlibEncoder;
 import io.netty.handler.codec.string.StringDecoder;
 import org.apache.commons.lang.SystemUtils;
 import org.server.handler.FileServerHandler;
+import org.server.handler.MultiFileServerHandler;
 
 public class DbServer {
 
@@ -61,7 +62,8 @@ public class DbServer {
                     ByteBuf delimiter = Unpooled.copiedBuffer("$".getBytes());
                     ch.pipeline().addLast(new DelimiterBasedFrameDecoder(10240, delimiter));
                     ch.pipeline().addLast(new StringDecoder());
-                    ch.pipeline().addLast(new FileServerHandler());
+//                    ch.pipeline().addLast(new FileServerHandler());
+                    ch.pipeline().addLast(new MultiFileServerHandler());
                 }
             });
 
