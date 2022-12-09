@@ -108,6 +108,72 @@
                   <target>8</target>
               </configuration>
           </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jar-plugin</artifactId>
+              <configuration>
+                  <archive>
+                      <manifest>
+                          <addClasspath>true</addClasspath>
+                          <classpathPrefix>lib/</classpathPrefix>
+                      </manifest>
+                  </archive>
+                  <outputDirectory>
+                    ${project.build.directory}/CDB
+                  </outputDirectory>
+                  <!--不打入jar包的文件类型或者路径-->
+                  <excludes>
+                    <exclude>**/*.properties</exclude>
+                    <exclude>**/*.gz</exclude>
+                    <exclude>**/*.java</exclude>
+                  </excludes>
+              </configuration>
+          </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>copy-dependencies</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                <overWriteReleases>false</overWriteReleases>
+                <overWriteSnapshots>false</overWriteSnapshots>
+                <overWriteIfNewer>true</overWriteIfNewer>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>copy-resources</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <encoding>UTF-8</encoding>
+                <!--打成jar包后复制到的路径-->
+                <outputDirectory>
+                  ${project.build.directory}/conf
+                </outputDirectory>
+                <resources>
+                  <resource>
+                    <!--项目中的路径-->
+                    <directory>src/main/resources/</directory>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
   </build>
 </project>
