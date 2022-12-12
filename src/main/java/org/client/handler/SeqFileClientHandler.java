@@ -5,18 +5,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.util.MyMapFile;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 public class SeqFileClientHandler extends ChannelInboundHandlerAdapter {
 
     MyMapFile readFile;
     MyMapFile writeFile;
     int seq;
-    public static ByteBuf preByteBuf;
     public static int num = 0;
-    public static ExecutorService threadPool = Executors.newSingleThreadExecutor();
 
     public SeqFileClientHandler(MyMapFile readFile, MyMapFile writeFile) {
         this.readFile = readFile;
@@ -31,7 +25,6 @@ public class SeqFileClientHandler extends ChannelInboundHandlerAdapter {
             if(byteBuf != null)
             {
                 ctx.writeAndFlush(byteBuf);
-                preByteBuf = readFile.readFile();
             }else {
                 System.out.println("文件已经读完");
             }
@@ -72,7 +65,6 @@ public class SeqFileClientHandler extends ChannelInboundHandlerAdapter {
             if(byteBuf != null)
             {
                 ctx.writeAndFlush(byteBuf);
-                preByteBuf = readFile.readFile();
             }else {
                 System.out.println("文件已经读完");
             }

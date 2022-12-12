@@ -17,6 +17,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import org.apache.commons.lang.SystemUtils;
 import org.client.handler.FileClientHandler;
 import org.client.handler.MultiFileClientHandler;
+import org.client.handler.SeqFileClientHandler;
 import org.util.MyMapFile;
 
 import java.io.*;
@@ -91,7 +92,8 @@ public class DbClient {
                     {
                         ch.pipeline().addLast(new FileClientHandler(readFile, writeFile));
                     }else{
-                        ch.pipeline().addLast(new MultiFileClientHandler(readFile, writeFile));
+//                        ch.pipeline().addLast(new MultiFileClientHandler(readFile, writeFile));
+                        ch.pipeline().addLast(new SeqFileClientHandler(readFile, writeFile));
                     }
                 }
             });
@@ -124,9 +126,18 @@ public class DbClient {
 
         int port = Integer.parseInt(properties.getProperty("port").trim());
         String host = properties.getProperty("ip").trim();
-        String readFileName = DbClient.class.getResource("/1.txt").getPath();
+        String readFileName = properties.getProperty("srcFile").trim();
+        if(readFileName.length() == 0)
+        {
+            readFileName = DbClient.class.getResource("/1.txt").getPath();
+        }
         readFileName = URLDecoder.decode(readFileName, "UTF-8");
-        String writeFileName = DbClient.class.getResource("/2.txt").getPath();
+
+        String writeFileName = properties.getProperty("dstFile").trim();
+        if(writeFileName.length() == 0)
+        {
+            writeFileName = DbClient.class.getResource("/2.txt").getPath();
+        }
         writeFileName = URLDecoder.decode(writeFileName, "UTF-8");
 
         try {
