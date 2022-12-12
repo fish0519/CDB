@@ -67,6 +67,7 @@ public class SeqFileClientHandler extends ChannelInboundHandlerAdapter {
                 ctx.writeAndFlush(byteBuf);
             }else {
                 System.out.println("文件已经读完");
+                ctx.close();
             }
         }finally {
             readFile.readLock.unlock();
