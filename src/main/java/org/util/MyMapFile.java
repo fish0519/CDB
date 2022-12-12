@@ -9,6 +9,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 //单线程操作
 public class MyMapFile {
@@ -20,7 +22,7 @@ public class MyMapFile {
     public long index = 0;
     public File file;
 
-    //并发控制变量
+    //方案1:用数组控制并发
     public static int threadNum;
     public static int count = 0;
     static {
@@ -29,7 +31,14 @@ public class MyMapFile {
     }
     public static int[] threadArr; //0 可读；1 可写
     public static boolean flag = true;// true 可读；false 可写
+
     public static AtomicBoolean finishRead = new AtomicBoolean(false);
+
+    //方案2:用锁并发控制
+    public AtomicInteger readSeq = new AtomicInteger(0);
+    public AtomicInteger writeSeq = new AtomicInteger(0);
+    public ReentrantLock readLock = new ReentrantLock();
+    public ReentrantLock writeLock = new ReentrantLock();
 
     public MyMapFile(File file, int mapSize, String mode) throws FileNotFoundException {
         this.raf = new RandomAccessFile(file, mode);

@@ -140,7 +140,7 @@
                 <goal>copy-dependencies</goal>
               </goals>
               <configuration>
-                <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                <outputDirectory>${project.build.directory}/CDB/lib</outputDirectory>
                 <overWriteReleases>false</overWriteReleases>
                 <overWriteSnapshots>false</overWriteSnapshots>
                 <overWriteIfNewer>true</overWriteIfNewer>
@@ -162,7 +162,7 @@
                 <encoding>UTF-8</encoding>
                 <!--打成jar包后复制到的路径-->
                 <outputDirectory>
-                  ${project.build.directory}/conf
+                  ${project.build.directory}/CDB/conf
                 </outputDirectory>
                 <resources>
                   <resource>
