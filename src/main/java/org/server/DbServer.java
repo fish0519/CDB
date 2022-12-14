@@ -32,10 +32,8 @@ public class DbServer {
     public static Properties properties = new Properties();
     static {
         try {
-            String clientFile = DbClient.class.getResource("/server.properties").getPath();
-            clientFile = URLDecoder.decode(clientFile, "UTF-8");
-
-            properties.load(new InputStreamReader(new FileInputStream(clientFile)));
+            String homePath = new File(System.getProperty("user.dir")).getAbsolutePath();
+            properties.load(new InputStreamReader(new FileInputStream(new File(homePath, "conf/server.properties"))));
             System.setProperty("serverMode", properties.getProperty("serverMode").trim());
 
         } catch (FileNotFoundException e) {
@@ -97,6 +95,7 @@ public class DbServer {
             });
 
             ChannelFuture f = b.bind(port).sync();
+            System.out.println("server start success");
             f.channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();

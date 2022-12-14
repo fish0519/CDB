@@ -2,10 +2,11 @@ package org.util;
 
 public class StringUtil {
 
-    public static Long addInt(String str)
+    public static StringBuilder addLong(String str)
     {
         int pre = 0;
         long result = 0L;
+        StringBuilder sb = new StringBuilder();
 
         for(int i = 0; i < str.length(); i++)
         {
@@ -20,37 +21,16 @@ public class StringUtil {
                 case '\r':
                 {
                     result += Long.parseLong(str.substring(pre, i));
-                    return result;
-                }
-                default:
-                {
-
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public static Float addFloat(String str)
-    {
-        int pre = 0;
-        Float result = 0f;
-
-        for(int i = 0; i < str.length(); i++)
-        {
-            switch (str.charAt(i))
-            {
-                case ',':
-                {
-                    result += Float.parseFloat(str.substring(pre, i));
+                    sb.append(result);
+                    sb.append("\r\n");
+                    result = 0;
                     pre =  i + 1;
                     break;
                 }
-                case '\r':
+                case '\n':
                 {
-                    result += Float.parseFloat(str.substring(pre, i));
-                    return result;
+                    pre =  i + 1;
+                    break;
                 }
                 default:
                 {
@@ -59,15 +39,11 @@ public class StringUtil {
             }
         }
 
-        return result;
+        return sb;
     }
 
     public static void main(String[] args) {
-        String str = "1,2,3,4\r\n";
-        long result = addInt(str);
-        System.out.println(result);
-
-        String str2 = "1.1,2.2,3.3,4.4\r\n";
-        System.out.println(addFloat(str2));
+        String str = "1,2,3,4\r\n2,3,4,5\r\n";
+        System.out.println(addLong(str));
     }
 }

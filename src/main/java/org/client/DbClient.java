@@ -32,10 +32,8 @@ public class DbClient {
     public static Properties properties = new Properties();
     static {
         try {
-            String clientFile = DbClient.class.getResource("/client.properties").getPath();
-            clientFile = URLDecoder.decode(clientFile, "UTF-8");
-
-            properties.load(new InputStreamReader(new FileInputStream(clientFile)));
+            String homePath = new File(System.getProperty("user.dir")).getAbsolutePath();
+            properties.load(new InputStreamReader(new FileInputStream(new File(homePath, "conf/client.properties"))));
 
             System.setProperty("clientNum", properties.getProperty("clientNum").trim());
             System.setProperty("clientMode", properties.getProperty("clientMode").trim());
@@ -164,6 +162,7 @@ public class DbClient {
                     dbClient.realConnect(port, host);
                 }
             }
+            System.out.println("client start success");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

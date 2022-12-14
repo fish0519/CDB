@@ -167,7 +167,7 @@
                 <resources>
                   <resource>
                     <!--项目中的路径-->
-                    <directory>src/main/resources/</directory>
+                    <directory>src/../conf</directory>
                   </resource>
                 </resources>
               </configuration>

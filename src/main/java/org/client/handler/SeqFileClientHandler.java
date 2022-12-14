@@ -5,12 +5,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.util.MyMapFile;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class SeqFileClientHandler extends ChannelInboundHandlerAdapter {
 
     MyMapFile readFile;
     MyMapFile writeFile;
     int seq;
-    public static int num = 0;
+    public static AtomicInteger num = new AtomicInteger(0);
 
     public SeqFileClientHandler(MyMapFile readFile, MyMapFile writeFile) {
         this.readFile = readFile;
@@ -36,7 +38,7 @@ public class SeqFileClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, final Object msg) throws Exception {
 
         final String serverMsg = (String)msg;
-        System.out.print("第"+ (++num) +"条服务端消息:" + serverMsg);
+        System.out.print(Thread.currentThread().getId()+"接收第"+ num.getAndIncrement() +"条服务端消息:");
 
         while(true)
         {

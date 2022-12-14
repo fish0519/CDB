@@ -106,12 +106,12 @@ public class MyMapFile {
     public void writeFile(byte[] byteArr)
     {
         long curIndex = index;
-        System.out.println("writeFile");
+//        System.out.println("writeFile");
 
         long targetIndex = curIndex + byteArr.length;
         try {
-            System.out.println("写" + curIndex + "到" + targetIndex + "成功");
-            System.out.println(new String(byteArr));
+//            System.out.println("写" + curIndex + "到" + targetIndex + "成功");
+//            System.out.println(new String(byteArr));
             MappedByteBuffer map = fileChannel.map(FileChannel.MapMode.READ_WRITE, curIndex, targetIndex - curIndex);
             map.position();
             map.put(byteArr);
