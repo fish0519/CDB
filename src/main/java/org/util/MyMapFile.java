@@ -51,7 +51,6 @@ public class MyMapFile {
     public ByteBuf readFile()
     {
         long curIndex = index;
-        System.out.println("readFile");
         if(curIndex < size)
         {
             long targetIndex = (curIndex + mapSize) > size ? size : curIndex + mapSize;
@@ -62,7 +61,7 @@ public class MyMapFile {
             int byteArrLineIndex = 0;
 
             try {
-                System.out.println("读取" + curIndex + "到" + targetIndex + "成功");
+//                System.out.println("读取" + curIndex + "到" + targetIndex + "成功");
                 MappedByteBuffer map = fileChannel.map(FileChannel.MapMode.READ_ONLY, curIndex, targetIndex - curIndex);
 
                 int i = 0;

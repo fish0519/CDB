@@ -14,6 +14,9 @@ public class SeqFileClientHandler extends ChannelInboundHandlerAdapter {
     int seq;
     public static AtomicInteger num = new AtomicInteger(0);
 
+    public static AtomicInteger finishNum = new AtomicInteger(0);
+    public static long startTime = System.currentTimeMillis();
+
     public SeqFileClientHandler(MyMapFile readFile, MyMapFile writeFile) {
         this.readFile = readFile;
         this.writeFile = writeFile;
@@ -38,7 +41,7 @@ public class SeqFileClientHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, final Object msg) throws Exception {
 
         final String serverMsg = (String)msg;
-        System.out.print(Thread.currentThread().getId()+"接收第"+ num.getAndIncrement() +"条服务端消息:");
+        System.out.println(Thread.currentThread().getId()+"接收第"+ num.getAndIncrement() +"条服务端消息:");
 
         while(true)
         {
@@ -63,12 +66,19 @@ public class SeqFileClientHandler extends ChannelInboundHandlerAdapter {
         try {
             readFile.readLock.lock();
             seq = readFile.readSeq.getAndIncrement();
+            System.out.println("读取文件线程:"+Thread.currentThread().getId());
             ByteBuf byteBuf = readFile.readFile();
             if(byteBuf != null)
             {
                 ctx.writeAndFlush(byteBuf);
             }else {
                 System.out.println("文件已经读完");
+                int finish = finishNum.incrementAndGet();
+                if(finish == Integer.parseInt(System.getProperty("clientNum")))
+                {
+                    long endTime = System.currentTimeMillis();
+                    System.out.println("总耗时:"+(endTime-startTime)/1000);
+                }
                 ctx.close();
             }
         }finally {
