@@ -59,7 +59,7 @@ public class SeqFileClientHandler extends ChannelInboundHandlerAdapter {
                     writeFile.writeLock.unlock();
                 }
             }else{
-                Thread.sleep(5);
+                Thread.sleep(2);
             }
         }
 

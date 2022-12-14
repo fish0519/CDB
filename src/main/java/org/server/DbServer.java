@@ -80,10 +80,10 @@ public class DbServer {
                 @Override
                 protected void initChannel(Channel ch) throws Exception {
 //                    ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
-                    ch.pipeline().addLast("gzipDecoder", new JdkZlibDecoder());
-                    ch.pipeline().addLast("gzipEncoder", new JdkZlibEncoder(9));
+//                    ch.pipeline().addLast("gzipDecoder", new JdkZlibDecoder());
+//                    ch.pipeline().addLast("gzipEncoder", new JdkZlibEncoder(9));
                     ByteBuf delimiter = Unpooled.copiedBuffer("$".getBytes());
-                    ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024*1024, delimiter));
+                    ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024*1024*2, delimiter));
                     ch.pipeline().addLast(new StringDecoder());
                     if(System.getProperty("serverMode").equals("1"))
                     {
