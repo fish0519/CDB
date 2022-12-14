@@ -7,6 +7,8 @@ import io.netty.buffer.Unpooled;
 import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,6 +41,10 @@ public class MyMapFile {
     public AtomicInteger writeSeq = new AtomicInteger(0);
     public ReentrantLock readLock = new ReentrantLock();
     public ReentrantLock writeLock = new ReentrantLock();
+
+    //方案3:数组记录结果,单线程写
+    public AtomicInteger resultNum = new AtomicInteger(0);
+    public Object[] result = new Object[100000000];
 
     public MyMapFile(File file, int mapSize, String mode) throws FileNotFoundException {
         this.raf = new RandomAccessFile(file, mode);

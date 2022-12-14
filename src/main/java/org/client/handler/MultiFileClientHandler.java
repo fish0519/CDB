@@ -35,8 +35,11 @@ public class MultiFileClientHandler extends ChannelInboundHandlerAdapter {
 
         final String serverMsg = (String)msg;
         int msgNum = num.incrementAndGet();
-        System.out.println();
-        System.out.println("第"+ msgNum +"条服务端消息:" + serverMsg);
+        if(msgNum%300 == 0)
+        {
+            System.out.println("第"+ msgNum +"条服务端消息:" + serverMsg);
+        }
+
         byte[] sBytes = serverMsg.getBytes();
         boolean writeFlag = writeFile.write(sBytes);
         while (!writeFlag)

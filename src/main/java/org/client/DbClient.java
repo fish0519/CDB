@@ -22,6 +22,8 @@ import org.util.MyMapFile;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class DbClient {
@@ -163,6 +165,46 @@ public class DbClient {
                 }
             }
             System.out.println("client start success");
+
+            Thread thread = new Thread(new Runnable() {
+                boolean writeFinish = false;
+                int writeIndex = 0;
+                @Override
+                public void run() {
+                    while(true)
+                    {
+                        if(writeMapFile.resultNum.get() == 0 && readMapFile.finishRead.get())
+                        {
+                            if(writeFinish)
+                            {
+                                System.out.println("write end");
+                                break;
+                            }
+                            writeFinish = true;
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        for(int i = 0; i < writeMapFile.resultNum.get(); i++)
+                        {
+                            byte[] writeByte = (byte[]) writeMapFile.result[writeIndex];
+                            if(writeByte != null)
+                            {
+                                writeMapFile.writeFile(writeByte);
+                                writeMapFile.result[writeIndex] = null;
+                                writeIndex ++;
+                                writeMapFile.resultNum.decrementAndGet();
+                            }else{
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+            thread.setDaemon(true);
+            thread.start();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

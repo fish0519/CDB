@@ -22,7 +22,10 @@ public class MultiFileServerHandler extends ChannelInboundHandlerAdapter {
         ctx.channel().eventLoop().execute(()->{
             String clientMsg = (String) msg;
             int clientNum = num.incrementAndGet();
-            System.out.println(Thread.currentThread().getId()+"接收第" + clientNum + "条客户端消息:");
+            if(clientNum%300 == 0)
+            {
+                System.out.println(Thread.currentThread().getId()+"接收第" + clientNum + "条客户端消息:");
+            }
 
 //            Parser.Lexer lexer = new MyLexer(new StringReader(clientMsg));
 //            Parser parser = new Parser(lexer);
@@ -60,7 +63,7 @@ public class MultiFileServerHandler extends ChannelInboundHandlerAdapter {
     {
         int pre = 0;
         long result = 0L;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(1024);
 
         for(int i = 0; i < str.length(); i++)
         {
