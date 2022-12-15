@@ -37,7 +37,12 @@ public class DbClient {
             String homePath = new File(System.getProperty("user.dir")).getAbsolutePath();
             properties.load(new InputStreamReader(new FileInputStream(new File(homePath, "conf/client.properties"))));
 
-            System.setProperty("clientNum", properties.getProperty("clientNum").trim());
+            int cpuNum = Runtime.getRuntime().availableProcessors();
+            if(properties.getProperty("clientNum").trim().length() != 0)
+            {
+                cpuNum = Integer.parseInt(properties.getProperty("clientNum").trim());
+            }
+            System.setProperty("clientNum", String.valueOf(cpuNum));
             System.setProperty("clientMode", properties.getProperty("clientMode").trim());
             System.setProperty("mmpSize", properties.getProperty("mmpSize").trim());
 
@@ -177,7 +182,7 @@ public class DbClient {
                         {
                             if(writeFinish)
                             {
-                                System.out.println("write end");
+                                System.out.println("End");
                                 break;
                             }
                             writeFinish = true;

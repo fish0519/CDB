@@ -70,16 +70,27 @@ public class MyMapFile {
 //                System.out.println("读取" + curIndex + "到" + targetIndex + "成功");
                 MappedByteBuffer map = fileChannel.map(FileChannel.MapMode.READ_ONLY, curIndex, targetIndex - curIndex);
 
+                // 先全部读取需要的内容
+                map.get(byteArr, 0, (int) (targetIndex - curIndex));
                 int i = 0;
                 for(; i < targetIndex - curIndex; i++)
                 {
-                    byte bb = map.get();
-                    if(bb == 10) //换行符
+                    if(byteArr[i] == 10) //换行符
                     {
                         byteArrLineIndex = i;
                     }
-                    byteArr[i] = bb;
                 }
+
+//                int i = 0;
+//                for(; i < targetIndex - curIndex; i++)
+//                {
+//                    byte bb = map.get();
+//                    if(bb == 10) //换行符
+//                    {
+//                        byteArrLineIndex = i;
+//                    }
+//                    byteArr[i] = bb;
+//                }
 
                 if(byteArrLineIndex == 0)//最后一行,没有换行符
                 {
